@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: Companies Microservice API
+  description: >
+    Microservicio de empresas de EcoRed Circular.
+    Autenticación con Firebase ID Token (`Authorization: Bearer <ID_TOKEN>`).
+    El `id` de contrato se documenta como entero para la rúbrica; el runtime
+    MongoDB también acepta ObjectId en string.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Proxy Nginx local (Docker Compose)
+  - url: http://localhost:8000
+    description: Servicio directo
+tags:
+  - name: companies
+  - name: health
+security:
+  - BearerAuth: []
+
+paths:
+  /api/v1/health/:
+    get:
+      tags: [health]
+      summary: Salud del servicio
+      security: []
+      responses:
+        "200":
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /api/v1/companies:
+    get:
+      tags: [companies]
+      summary: Listar empresas del usuario autenticado
+      responses:
+        "200":
+          description: Listado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [companies]
+      summary: Crear empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "201":
+          description: Creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/companies/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
+    get:
+      tags: [companies]
+      summary: Obtener una empresa
+      responses:
+        "200":
+          description: Empresa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [companies]
+      summary: Actualizar una empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "200":
+          description: Actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [companies]
+      summary: Eliminar una empresa
+      responses:
+        "200":
+          description: Eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase ID Token
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  schemas:
+    Company:
+      type: object
+      required: [id, name, nit, city]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: EcoRed SAS
+        nit:
+          type: string
+          example: "900123456"
+        city:
+          type: string
+          example: Bogotá
+        owner_uid:
+          type: string
+        sector:
+          type: string
+        descripcion:
+          type: string
+        comunidad:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    CompanyInput:
+      type: object
+      required: [name, nit]
+      properties:
+        name:
+          type: string
+        nit:
+          type: string
+        city:
+          type: string
+        sector:
+          type: string
+        descripcion:
+          type: string
+        comunidad:
+          type: string
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: companies-service
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+    DeleteResult:
+      type: object
+      properties:
+        status:
+          type: string
+          example: deleted
+        id:
+          type: string
+
+  responses:
+    InvalidData:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: INVALID_DATA
+            message: Los datos enviados no son válidos
+            errors:
+              name: El nombre es obligatorio (3 a 100 caracteres)
+    Unauthenticated:
+      description: Token ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: UNAUTHENTICATED
+            message: Token inválido o vencido
+    Forbidden:
+      description: Sin permiso sobre el recurso
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: FORBIDDEN
+            message: No autorizado
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: NOT_FOUND
+            message: Recurso no encontrado

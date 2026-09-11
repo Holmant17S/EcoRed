@@ -1,0 +1,28 @@
+[
+  {
+    "id": "mock-material-1",
+    "company_id": "mock-company-1",
+    "material_type": "Plástico PET",
+    "quantity": 80,
+    "unit": "kg",
+    "location": "Bogotá",
+    "descripcion": "Botellas limpias",
+    "precio": 1500,
+    "status": "available",
+    "published_by": "mock-uid",
+    "created_at": "2026-03-03T12:00:00+00:00"
+  },
+  {
+    "id": "mock-material-2",
+    "company_id": "mock-company-2",
+    "material_type": "Cartón",
+    "quantity": 120,
+    "unit": "kg",
+    "location": "Medellín",
+    "descripcion": "Cajas prensadas",
+    "precio": 800,
+    "status": "available",
+    "published_by": "mock-uid",
+    "created_at": "2026-03-04T12:00:00+00:00"
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "code": "INVALID_DATA",
+  "message": "Los datos enviados no son válidos",
+  "errors": {
+    "quantity": "quantity debe ser mayor que 0"
+  }
+}

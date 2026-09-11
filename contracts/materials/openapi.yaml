@@ -1,0 +1,273 @@
+openapi: 3.0.3
+info:
+  title: Materials Microservice API
+  description: >
+    Microservicio de publicaciones de materiales de EcoRed Circular.
+    No consulta la colección de empresas; solo guarda `company_id` como referencia.
+    Autenticación con Firebase ID Token (`Authorization: Bearer <ID_TOKEN>`).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Proxy Nginx local (Docker Compose)
+  - url: http://localhost:8000
+    description: Servicio directo
+tags:
+  - name: materials
+  - name: health
+security:
+  - BearerAuth: []
+
+paths:
+  /api/v1/health/:
+    get:
+      tags: [health]
+      summary: Salud del servicio
+      security: []
+      responses:
+        "200":
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /api/v1/materials:
+    get:
+      tags: [materials]
+      summary: Listar materiales del usuario autenticado
+      responses:
+        "200":
+          description: Listado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Material"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [materials]
+      summary: Crear publicación de material
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialInput"
+      responses:
+        "201":
+          description: Creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/materials/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
+    get:
+      tags: [materials]
+      summary: Obtener una publicación
+      responses:
+        "200":
+          description: Material
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [materials]
+      summary: Actualizar una publicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialInput"
+      responses:
+        "200":
+          description: Actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [materials]
+      summary: Eliminar una publicación
+      responses:
+        "200":
+          description: Eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase ID Token
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  schemas:
+    Material:
+      type: object
+      required: [id, company_id, material_type, quantity]
+      properties:
+        id:
+          type: integer
+          example: 1
+        company_id:
+          type: integer
+          example: 1
+        material_type:
+          type: string
+          example: Plástico PET
+        quantity:
+          type: number
+          example: 80
+        unit:
+          type: string
+          example: kg
+        location:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        status:
+          type: string
+          example: available
+        published_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    MaterialInput:
+      type: object
+      required: [company_id, material_type, quantity, precio]
+      properties:
+        company_id:
+          type: integer
+        material_type:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        location:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        status:
+          type: string
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: materials-service
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+    DeleteResult:
+      type: object
+      properties:
+        status:
+          type: string
+          example: deleted
+        id:
+          type: string
+
+  responses:
+    InvalidData:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: INVALID_DATA
+            message: Los datos enviados no son válidos
+            errors:
+              material_type: material_type es obligatorio
+    Unauthenticated:
+      description: Token ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: UNAUTHENTICATED
+            message: Token inválido o vencido
+    Forbidden:
+      description: Sin permiso sobre el recurso
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: FORBIDDEN
+            message: No autorizado
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          example:
+            code: NOT_FOUND
+            message: Recurso no encontrado

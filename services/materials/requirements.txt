@@ -1,0 +1,7 @@
+Django==6.0.7
+djangorestframework==3.17.1
+django-cors-headers==4.9.0
+firebase_admin==7.5.0
+pymongo==4.17.0
+python-dotenv==1.2.2
+gunicorn==26.0.0

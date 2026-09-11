@@ -1,0 +1,75 @@
+name: ecored-circular
+
+services:
+  companies-service:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: services/companies/Dockerfile
+    image: companies-service:v1.0.0
+    container_name: companies-service
+    env_file:
+      - ./backend/.env
+    environment:
+      DJANGO_ALLOWED_HOSTS: "*"
+      FIREBASE_CREDENTIALS_PATH: /run/secrets/firebase.json
+      CORS_ALLOWED_ORIGINS: http://localhost:8080,http://localhost:5173
+    volumes:
+      - ./backend/firebase-service-account.json:/run/secrets/firebase.json:ro
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  materials-service:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: services/materials/Dockerfile
+    image: materials-service:v1.0.0
+    container_name: materials-service
+    env_file:
+      - ./backend/.env
+    environment:
+      DJANGO_ALLOWED_HOSTS: "*"
+      FIREBASE_CREDENTIALS_PATH: /run/secrets/firebase.json
+      CORS_ALLOWED_ORIGINS: http://localhost:8080,http://localhost:5173
+    volumes:
+      - ./backend/firebase-service-account.json:/run/secrets/firebase.json:ro
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  frontend:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Build-time: Vite embebe estas variables en el bundle.
+        # Se leen del archivo .env de la raíz (mismo contenido que frontend/.env).
+        VITE_API_URL: /api/v1
+        VITE_USE_MOCKS: "false"
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
+    image: frontend:v1.0.0
+    container_name: frontend
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  proxy:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: proxy/Dockerfile
+    image: ecored-proxy:v1.0.0
+    container_name: ecored-proxy
+    ports:
+      - "8080:80"
+    depends_on:
+      - companies-service
+      - materials-service
+      - frontend
+    restart: unless-stopped

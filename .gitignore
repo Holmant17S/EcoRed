@@ -1,0 +1,32 @@
+# Secretos y entornos locales (nunca subir)
+**/.env
+**/.env.*
+!.env.example
+!frontend/.env.example
+frontend/.env
+backend/.env
+backend/.env.*
+backend/firebase-service-account.json
+**/firebase-service-account.json
+**/.firebase*
+
+# Dependencias y builds
+**/venv/
+**/.venv/
+**/node_modules/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+*.log
+
+# Empaques
+*.zip
+*.tar
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

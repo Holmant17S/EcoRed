@@ -1,0 +1,37 @@
+{
+  "get": [
+    {
+      "id": 1,
+      "name": "EcoRed SAS",
+      "nit": "900123456",
+      "city": "Bogotá",
+      "owner_uid": "mock-uid",
+      "sector": "Reciclaje",
+      "descripcion": "Empresa demo de economía circular",
+      "comunidad": "Norte",
+      "created_at": "2026-03-01T12:00:00+00:00"
+    },
+    {
+      "id": 2,
+      "name": "Circular Plast",
+      "nit": "900654321",
+      "city": "Medellín",
+      "owner_uid": "mock-uid",
+      "sector": "Plásticos",
+      "descripcion": "Recuperación de PET",
+      "comunidad": "Sur",
+      "created_at": "2026-03-02T12:00:00+00:00"
+    }
+  ],
+  "post": {
+    "id": 3,
+    "name": "Nueva Circular",
+    "nit": "901111111",
+    "city": "Cali",
+    "owner_uid": "mock-uid",
+    "sector": "Orgánicos",
+    "descripcion": "Alta de prueba vía mock",
+    "comunidad": "Oeste",
+    "created_at": "2026-03-11T12:00:00+00:00"
+  }
+}

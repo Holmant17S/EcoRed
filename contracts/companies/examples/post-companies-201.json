@@ -1,0 +1,11 @@
+{
+  "id": "65f1a2b3c4d5e6f7a8b9c0d1",
+  "owner_uid": "firebaseUidEjemplo",
+  "name": "EcoRed SAS",
+  "nit": "900123456",
+  "city": "Bogotá",
+  "sector": "Reciclaje",
+  "descripcion": "Empresa de economía circular",
+  "comunidad": "Norte",
+  "created_at": "2026-03-10T15:00:00+00:00"
+}
