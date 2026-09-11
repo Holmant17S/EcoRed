@@ -23,13 +23,14 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-COMPONENTES=("frontend" "services/companies" "services/materials" "proxy")
+COMPONENTES=("frontend" "services/companies" "services/materials" "services/requests" "proxy")
 
 image_name_for() {
   case "$1" in
     frontend) echo "frontend" ;;
     services/companies) echo "companies-service" ;;
     services/materials) echo "materials-service" ;;
+    services/requests) echo "requests-service" ;;
     proxy) echo "proxy" ;;
     *) echo "$(basename "$1")" ;;
   esac
@@ -40,6 +41,7 @@ dockerfile_for() {
     frontend) echo "frontend/Dockerfile" ;;
     services/companies) echo "services/companies/Dockerfile" ;;
     services/materials) echo "services/materials/Dockerfile" ;;
+    services/requests) echo "services/requests/Dockerfile" ;;
     proxy) echo "proxy/Dockerfile" ;;
     *) echo "$1/Dockerfile" ;;
   esac

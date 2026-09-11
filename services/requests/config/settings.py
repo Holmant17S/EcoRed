@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-materials-insecure-key")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-requests-insecure-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv(
     "DJANGO_ALLOWED_HOSTS",
-    "127.0.0.1,localhost,materials-service",
+    "127.0.0.1,localhost,requests-service",
 ).split(",")
 
 INSTALLED_APPS = [
@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "rest_framework",
     "corsheaders",
-    "materials",
+    "solicitudes",
 ]
 
 MIDDLEWARE = [

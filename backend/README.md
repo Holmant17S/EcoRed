@@ -1,8 +1,8 @@
-# Esta carpeta solo guarda configuración local de los microservicios.
-# No contiene código de aplicación (el código vive en services/).
+# Esta carpeta solo guarda secretos locales. El código vive en services/.
 #
 # Archivos esperados (NO subir a Git):
-# - .env                      → MONGODB_URI, DJANGO_SECRET_KEY, etc.
+# - .env
 # - firebase-service-account.json
+# - cualquier *firebase-adminsdk*.json
 #
-# docker-compose.yaml monta estos archivos en companies-service y materials-service.
+# docker-compose.yaml los monta en companies, materials y requests.

@@ -8,6 +8,8 @@ backend/.env
 backend/.env.*
 backend/firebase-service-account.json
 **/firebase-service-account.json
+**/*firebase-adminsdk*.json
+**/*-adminsdk-*.json
 **/.firebase*
 
 # Dependencias y builds
@@ -24,6 +26,9 @@ backend/firebase-service-account.json
 *.zip
 *.tar
 *.tar.gz
+
+# Colecciones REST locales con credenciales
+firebase-materials-simple.http
 
 # IDE
 .vscode/

@@ -1,4 +1,4 @@
-# Diagrama de microservicios — EcoRed Circular (equipo de 3)
+# Diagrama de microservicios — EcoRed Circular
 
 ```text
                     ┌─────────────────────┐
@@ -8,39 +8,36 @@
                                ▼
                     ┌─────────────────────┐
                     │  proxy (Nginx)      │
-                    │  rutas estables     │
-                    └──┬───────┬───────┬──┘
-                       │       │       │
-         /             │       │       │
-         ▼             │       │       │
-┌──────────────┐       │       │       │
-│   frontend   │       │       │       │
-│  React SPA   │       │       │       │
-└──────────────┘       │       │       │
-                       │       │       │
-        /api/v1/companies/     │   /api/v1/materials/
-                       ▼       │       ▼
-            ┌──────────────────┐   ┌──────────────────┐
-            │ companies-service│   │ materials-service│
-            │  Django + DRF    │   │  Django + DRF    │
-            │  colección:      │   │  colección:      │
-            │  companies       │   │  material_       │
-            └────────┬─────────┘   │  listings        │
-                     │             └────────┬─────────┘
-                     │                      │
-                     └──────────┬───────────┘
-                                ▼
-                     ┌─────────────────────┐
-                     │   MongoDB Atlas     │
-                     └─────────────────────┘
+                    └──┬────┬─────┬────┬──┘
+                       │    │     │    │
+         /             │    │     │    │
+         ▼             │    │     │    │
+┌──────────────┐       │    │     │    │
+│   frontend   │       │    │     │    │
+└──────────────┘       │    │     │    │
+                       │    │     │    │
+      /api/v1/companies/    │     │    /api/v1/requests/
+                       ▼    │     ▼    ▼
+            ┌──────────────┐│┌──────────────┐┌──────────────┐
+            │ companies    │││ materials    ││ requests     │
+            │ -service     │││ -service     ││ -service     │
+            │ companies    │││ listings     ││ material_    │
+            └──────┬───────┘│└──────┬───────┘│ requests     │
+                   │        │       │        └──────┬───────┘
+                   └────────┴───────┴───────────────┘
+                                    ▼
+                         ┌─────────────────────┐
+                         │   MongoDB Atlas     │
+                         └─────────────────────┘
 
-Auth: Firebase (frontend obtiene ID Token; cada MS lo valida con Admin SDK)
+Auth: Firebase ID Token. Cada microservicio lo valida con Admin SDK.
 ```
 
-## Matriz de responsables
+## Matriz de componentes
 
-| Estudiante | Componente | Responsabilidad | Datos propios | Ruta base | Imagen OCIR |
-|---|---|---|---|---|---|
-| A | companies-service | CRUD empresas | `companies` | `/api/v1/companies` | `companies-service:v1.0.0` |
-| B | materials-service | Publicaciones | `material_listings` | `/api/v1/materials` | `materials-service:v1.0.0` |
-| C | frontend + proxy | UI, mocks, enrutamiento | — | `/` | `frontend:v1.0.0` |
+| Componente | Responsabilidad | Datos propios | Ruta base | Imagen |
+|---|---|---|---|---|
+| companies-service | CRUD empresas | `companies` | `/api/v1/companies` | `companies-service:v1.0.0` |
+| materials-service | Publicaciones | `material_listings` | `/api/v1/materials` | `materials-service:v1.0.0` |
+| requests-service | Solicitudes | `material_requests` | `/api/v1/requests` | `requests-service:v1.0.0` |
+| frontend + proxy | UI y enrutamiento | — | `/` | `frontend:v1.0.0` |

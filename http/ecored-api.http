@@ -1,0 +1,86 @@
+# Colección REST Client (VS Code / Cursor) — EcoRed Circular
+# No pongas contraseñas reales en este archivo si lo vas a commitear.
+#
+# 1. Copia FIREBASE_API_KEY desde Firebase Console (apiKey web).
+# 2. Usa un usuario de Firebase Authentication.
+# 3. Send primero "INICIAR SESIÓN"; el idToken se reutiliza abajo.
+# 4. Proxy local: http://localhost:8080  (Docker Compose)
+
+@FIREBASE_API_KEY = PEGA_AQUI_TU_API_KEY
+@EMAIL = usuario@correo.com
+@PASSWORD = ********
+@BASE = http://localhost:8080
+
+### 1. INICIAR SESIÓN EN FIREBASE
+# @name firebaseLogin
+POST https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{FIREBASE_API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{EMAIL}}",
+  "password": "{{PASSWORD}}",
+  "returnSecureToken": true
+}
+
+### Health empresas
+GET {{BASE}}/api/v1/health/companies
+
+### Health materiales
+GET {{BASE}}/api/v1/health/materials
+
+### Health solicitudes
+GET {{BASE}}/api/v1/health/requests
+
+### GET empresas
+GET {{BASE}}/api/v1/companies/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+
+### POST empresa
+POST {{BASE}}/api/v1/companies/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+Content-Type: application/json
+
+{
+  "name": "EcoRed SAS",
+  "nit": "900123456",
+  "city": "Bogotá",
+  "sector": "Reciclaje",
+  "descripcion": "Empresa de economía circular",
+  "comunidad": "Norte"
+}
+
+### GET materiales
+GET {{BASE}}/api/v1/materials/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+
+### POST material
+POST {{BASE}}/api/v1/materials/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+Content-Type: application/json
+
+{
+  "company_id": "PEGA_ID_EMPRESA",
+  "material_type": "Plástico PET",
+  "quantity": 80,
+  "unit": "kg",
+  "location": "Bogotá",
+  "descripcion": "Botellas limpias",
+  "precio": 1500,
+  "status": "available"
+}
+
+### GET solicitudes
+GET {{BASE}}/api/v1/requests/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+
+### POST solicitud
+POST {{BASE}}/api/v1/requests/
+Authorization: Bearer {{firebaseLogin.response.body.$.idToken}}
+Content-Type: application/json
+
+{
+  "material_id": "PEGA_ID_MATERIAL",
+  "company_id": "PEGA_ID_EMPRESA",
+  "quantity": 20,
+  "message": "Necesito PET para un piloto"
+}

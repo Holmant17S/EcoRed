@@ -74,22 +74,23 @@ class FirebaseAuthentication(BaseAuthentication):
         try:
             ensure_firebase_initialized()
             decoded_token = auth.verify_id_token(id_token)
-            request.firebase_user = decoded_token
-            user = FirebaseUser(
-                uid=decoded_token.get("uid"),
-                email=decoded_token.get("email"),
-            )
-            return (user, id_token)
         except exceptions.AuthenticationFailed:
             raise
         except Exception:
-            logger.exception("Error validando token de Firebase")
+            logger.warning("Token de Firebase inválido o vencido")
             raise exceptions.AuthenticationFailed(
                 {
                     "code": "UNAUTHENTICATED",
                     "message": "Token inválido o vencido",
                 }
             )
+
+        request.firebase_user = decoded_token
+        user = FirebaseUser(
+            uid=decoded_token.get("uid"),
+            email=decoded_token.get("email"),
+        )
+        return (user, id_token)
 
     def authenticate_header(self, request):
         return "Bearer"

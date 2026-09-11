@@ -98,6 +98,7 @@ class CompaniesContractTests(SimpleTestCase):
         request = self.factory.get("/api/v1/companies/")
         response = CompanyViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data["code"], "UNAUTHENTICATED")
 
     def test_invalid_token_is_401(self):
         request = self.factory.get(
@@ -106,6 +107,21 @@ class CompaniesContractTests(SimpleTestCase):
         )
         with self.assertRaises(AuthenticationFailed):
             FirebaseAuthentication().authenticate(request)
+
+    @patch("firebase_auth.authentication.ensure_firebase_initialized")
+    @patch(
+        "firebase_auth.authentication.auth.verify_id_token",
+        side_effect=Exception("expired"),
+    )
+    def test_expired_token_view_returns_401(self, _verify, _init):
+        request = self.factory.get(
+            "/api/v1/companies/",
+            HTTP_AUTHORIZATION="Bearer token-invalido-o-vencido",
+        )
+        response = CompanyViewSet.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data["code"], "UNAUTHENTICATED")
+        self.assertEqual(response.data["message"], "Token inválido o vencido")
 
     @patch("companies.views.companies_collection")
     def test_retrieve_not_found(self, collection):

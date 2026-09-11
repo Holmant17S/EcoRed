@@ -1,0 +1,24 @@
+{
+  "get": [
+    {
+      "id": 1,
+      "material_id": 1,
+      "company_id": 1,
+      "quantity": 20,
+      "message": "Necesito PET para un piloto",
+      "status": "pending",
+      "requested_by": "mock-uid",
+      "created_at": "2026-03-11T12:00:00+00:00"
+    }
+  ],
+  "post": {
+    "id": 2,
+    "material_id": 1,
+    "company_id": 1,
+    "quantity": 15,
+    "message": "Solicitud de prueba vía mock",
+    "status": "pending",
+    "requested_by": "mock-uid",
+    "created_at": "2026-03-11T13:00:00+00:00"
+  }
+}

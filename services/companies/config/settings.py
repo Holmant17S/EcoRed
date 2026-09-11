@@ -22,6 +22,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "firebase_auth.middleware.UnauthenticatedStatusMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -39,6 +40,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "firebase_auth.FirebaseIsAuthenticated",
     ],
+    "EXCEPTION_HANDLER": "firebase_auth.exceptions.firebase_exception_handler",
 }
 
 LANGUAGE_CODE = "es"

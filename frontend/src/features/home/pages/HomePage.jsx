@@ -51,6 +51,15 @@ export default function HomePage() {
             variant="success"
           />
         </div>
+        <div className="col-md-6">
+          <ModuleCard
+            title="Solicitudes"
+            description="Pide materiales publicados mediante el microservicio requests-service."
+            to="/requests"
+            actionLabel="Ir a Solicitudes"
+            variant="warning"
+          />
+        </div>
       </div>
     </section>
   );

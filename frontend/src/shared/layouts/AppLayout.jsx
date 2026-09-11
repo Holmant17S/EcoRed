@@ -47,6 +47,9 @@ export default function AppLayout() {
               <NavLink className={navClassName} to="/materials">
                 Materiales
               </NavLink>
+              <NavLink className={navClassName} to="/requests">
+                Solicitudes
+              </NavLink>
             </div>
 
             <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">

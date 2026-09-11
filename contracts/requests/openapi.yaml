@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Requests Microservice API
+  description: >
+    Microservicio de solicitudes de materiales de EcoRed Circular.
+    No consulta companies ni materials; solo guarda IDs de referencia.
+    Autenticación con Firebase ID Token (`Authorization: Bearer <ID_TOKEN>`).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Proxy Nginx local (Docker Compose)
+security:
+  - BearerAuth: []
+paths:
+  /api/v1/health/:
+    get:
+      security: []
+      responses:
+        "200":
+          description: Servicio operativo
+  /api/v1/requests:
+    get:
+      responses:
+        "200":
+          description: Listado
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInput"
+      responses:
+        "201":
+          description: Creada
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+  /api/v1/requests/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      responses:
+        "200":
+          description: Solicitud
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInput"
+      responses:
+        "200":
+          description: Actualizada
+        "400":
+          $ref: "#/components/responses/InvalidData"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      responses:
+        "200":
+          description: Eliminada
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RequestInput:
+      type: object
+      required: [material_id, company_id, quantity]
+      properties:
+        material_id:
+          type: string
+        company_id:
+          type: string
+        quantity:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+          enum: [pending, accepted, rejected]
+  responses:
+    InvalidData:
+      description: Datos inválidos
+      content:
+        application/json:
+          example:
+            code: INVALID_DATA
+            message: Los datos enviados no son válidos
+    Unauthenticated:
+      description: Token ausente o inválido
+      content:
+        application/json:
+          example:
+            code: UNAUTHENTICATED
+            message: Token inválido o vencido
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          example:
+            code: NOT_FOUND
+            message: Recurso no encontrado

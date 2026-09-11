@@ -1,11 +1,12 @@
 # Mocks — EcoRed Circular
 
-Datos simulados para desarrollar el frontend **sin levantar** los microservicios. Están alineados a `contracts/companies` y `contracts/materials`.
+Datos simulados para desarrollar el frontend **sin levantar** los microservicios. Están alineados a `contracts/`.
 
 | Archivo | GET | POST |
 |---|---|---|
-| `companies.json` | Lista de empresas (`id`, `name`, `nit`, `city`) | Recurso creado |
+| `companies.json` | Lista de empresas | Recurso creado |
 | `materials.json` | Lista de materiales | Recurso creado |
+| `requests.json` | Lista de solicitudes | Recurso creado |
 
 ## Opción A — Vite (`VITE_USE_MOCKS=true`)
 
@@ -15,7 +16,7 @@ En `frontend/.env`:
 VITE_USE_MOCKS=true
 ```
 
-Los clientes `companyService.js` y `materialService.js` leen estos JSON (alias `@mocks` → esta carpeta) y no llaman a `/api/v1`.
+Los clientes `companyService.js`, `materialService.js` y `requestService.js` leen estos JSON (alias `@mocks`) y no llaman a `/api/v1`.
 
 ## Opción B — json-server (API falsa en el puerto 3001)
 

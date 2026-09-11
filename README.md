@@ -1,14 +1,15 @@
 # EcoRed Circular — Microservicios, Docker y OCIR
 
-Proyecto descompuesto en **2 microservicios + 1 frontend** (equipo de 3), contenerizado con Docker Compose y publicado en **Oracle Cloud Infrastructure Registry (OCIR)**.
+Proyecto descompuesto en **3 microservicios + 1 frontend**, contenerizado con Docker Compose y publicado en **Oracle Cloud Infrastructure Registry (OCIR)**.
 
 ## Arquitectura
 
 ```text
 Browser → proxy (Nginx :8080)
-            ├─ /                 → frontend
-            ├─ /api/v1/companies → companies-service
-            └─ /api/v1/materials → materials-service
+            ├─ /                  → frontend
+            ├─ /api/v1/companies  → companies-service
+            ├─ /api/v1/materials  → materials-service
+            └─ /api/v1/requests   → requests-service
                                       ↓
                               MongoDB Atlas + Firebase Auth
 ```
@@ -17,6 +18,7 @@ Browser → proxy (Nginx :8080)
 |---|---|---|---|
 | Estudiante A | Empresas | `companies-service:v1.0.0` | `gru.ocir.io/gr8wnrtapwvy/ecored/companies-service:v1.0.0` |
 | Estudiante B | Materiales | `materials-service:v1.0.0` | `gru.ocir.io/gr8wnrtapwvy/ecored/materials-service:v1.0.0` |
+| — | Solicitudes | `requests-service:v1.0.0` | `gru.ocir.io/gr8wnrtapwvy/ecored/requests-service:v1.0.0` |
 | Estudiante C | UI + proxy | `frontend:v1.0.0` | `gru.ocir.io/gr8wnrtapwvy/ecored/frontend:v1.0.0` |
 
 Auth: Firebase ID Token (no hay microservicio de autenticación).  
@@ -27,13 +29,15 @@ Contratos y mocks: `contracts/` (fichas + OpenAPI 3.0.3) y `mocks/` (JSON + json
 ```text
 services/companies/     # Microservicio empresas
 services/materials/     # Microservicio materiales
+services/requests/      # Microservicio solicitudes
 frontend/               # React (Vite) + Dockerfile
 proxy/                  # Nginx gateway
 shared/firebase_auth/   # Validación de token compartida
 contracts/              # endpoints.md, examples JSON y openapi.yaml
 mocks/                  # JSON simulados + README (Vite / json-server)
 scripts/publish-ocir.sh # Build, tag semántico v1.0.0, push y verify en OCIR
-backend/                # Solo .env + firebase JSON (secretos locales)
+http/ecored-api.http    # Colección REST Client (sin secretos)
+backend/                # Solo secretos locales (no se suben)
 docker-compose.yaml     # Integración local
 docs/                   # Planificación del curso
 ```
@@ -46,7 +50,8 @@ docs/                   # Planificación del curso
 - Archivo `.env` en la raíz con las variables `VITE_FIREBASE_*` (para el build del frontend)
 - Cuenta OCI con acceso a OCIR (para publicar)
 
-Plantillas: `.env.example` y `frontend/.env.example`.
+Plantillas: `.env.example` y `frontend/.env.example`.  
+Pruebas HTTP: `http/ecored-api.http` (REST Client).
 
 ---
 
@@ -72,6 +77,7 @@ docker compose -f docker-compose.yaml ps
 - App: http://localhost:8080
 - Health empresas: http://localhost:8080/api/v1/health/companies
 - Health materiales: http://localhost:8080/api/v1/health/materials
+- Health solicitudes: http://localhost:8080/api/v1/health/requests
 
 ```powershell
 docker compose -f docker-compose.yaml logs --tail=100
@@ -89,7 +95,7 @@ docker compose -f docker-compose.yaml down
 
 ## OCIR — qué se hizo
 
-Se crearon **3 imágenes versionadas** (`v1.0.0`, no solo `latest`), se etiquetaron con el formato OCIR y se publicaron en la tenancy del equipo.
+Se crearon imágenes versionadas (`v1.0.0`, no solo `latest`) y se publicaron en la tenancy del equipo. El microservicio `requests-service` se añade al mismo esquema.
 
 ### Datos de publicación usados
 
@@ -105,6 +111,7 @@ Se crearon **3 imágenes versionadas** (`v1.0.0`, no solo `latest`), se etiqueta
 ```text
 gru.ocir.io/gr8wnrtapwvy/ecored/companies-service:v1.0.0
 gru.ocir.io/gr8wnrtapwvy/ecored/materials-service:v1.0.0
+gru.ocir.io/gr8wnrtapwvy/ecored/requests-service:v1.0.0
 gru.ocir.io/gr8wnrtapwvy/ecored/frontend:v1.0.0
 ```
 
@@ -171,6 +178,11 @@ cd ..\materials
 $env:PYTHONPATH = "..\..\shared;$PWD"
 python manage.py test tests
 
+# requests
+cd ..\requests
+$env:PYTHONPATH = "..\..\shared;$PWD"
+python manage.py test tests
+
 # frontend
 cd ..\..\frontend
 npm test
@@ -226,4 +238,4 @@ No incluir dependencias generadas ni credenciales.
 | Desarrollo por componente | `services/*`, `frontend/` |
 | Pruebas | `services/*/tests/` (200/201, 400, 401, 404) y `frontend` (Vitest) |
 | Contenerización e integración | Dockerfiles + `docker-compose.yaml` |
-| Publicación OCIR | 3 imágenes `v1.0.0` en `gru.ocir.io/.../ecored/` |
+| Publicación OCIR | Imágenes `v1.0.0` en `gru.ocir.io/.../ecored/` |
